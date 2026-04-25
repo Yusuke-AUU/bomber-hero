@@ -261,7 +261,12 @@ function setupTouch(){
     e.preventDefault();
     clearTimeout(holdTimer);
     if(!started){startGame();return;}
-    if(!tMoved) placeBomb(null);
+    if(!tMoved){
+      // Tap: detonate remote bombs if any exist, otherwise place bomb
+      const hasRemote=G.bombs.some(b=>b.remote&&b.owner===G.player);
+      if(hasRemote) detonateRemote();
+      else placeBomb(null);
+    }
     tActive=false;tMoved=false;
     window._swipeDx=0;window._swipeDy=0;
   },{passive:false});
@@ -373,7 +378,11 @@ function handleInput(dt){
     }else p.mt=p.md;
   }
   const bk=keys['Space']||keys['KeyZ'];
-  if(bk&&!lastBK)placeBomb(null);
+  if(bk&&!lastBK){
+    const hasRemote=G.bombs.some(b=>b.remote&&b.owner===G.player);
+    if(hasRemote) detonateRemote();
+    else placeBomb(null);
+  }
   lastBK=bk;
   if(p.inv>0)p.inv-=dt;
 }
